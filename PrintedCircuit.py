@@ -1,4 +1,4 @@
-import math
+from math import *
 
 class PrintedCircuit:
 
@@ -45,7 +45,7 @@ class PrintedCircuit:
     def getDistance(self, first, second):
         delta_x = abs(first[0] - second[0])
         delta_y = abs(first[1] - second[1])
-        return math.sqrt((delta_x*delta_x)+(delta_y*delta_y))
+        return sqrt((delta_x*delta_x)+(delta_y*delta_y))
 
 
     def getCorner(self):
@@ -57,4 +57,15 @@ class PrintedCircuit:
         return [coord_table[min_distance_list.index(min(min_distance_list))], coord_table[max_distance_list.index(min(max_distance_list))]]
 
 
+    def rotate_point(self, origin, angle, point):
+        radiant_angle = angle * (pi/180)
+        delta_x = point[0] - origin[0]
+        delta_y = point[1] - origin[1]
+        x = delta_x * cos(radiant_angle) + delta_y * sin(radiant_angle) + origin[0]
+        y = - delta_x * sin(radiant_angle) + delta_y * cos(radiant_angle) + origin[1]
+        return (x, y)
 
+
+    def get_transformed_coord(self, angle):
+        coord_table = self.getRelativeCoord()
+        return [self.rotate_point(self.getCorner()[0], angle, coord) for coord in coord_table]
