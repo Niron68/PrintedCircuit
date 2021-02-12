@@ -50,8 +50,8 @@ class Window:
 
 
     def refresh_preview(self):
-        new_coord = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(0), revert = self.reverse)
-        new_corners = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.getCorner(), revert = not self.reverse)
+        new_coord = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(-5), revert = self.reverse)
+        new_corners = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle = -5, coord_list = self.printed_circuit.getCorner()), revert = not self.reverse)
         self.preview_canvas.delete("all")
         for coord in new_coord:
             self.preview_canvas.create_rectangle(coord*2, outline=("red" if coord not in new_corners else "lime"))

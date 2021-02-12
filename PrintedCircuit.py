@@ -35,10 +35,23 @@ class PrintedCircuit:
             x_percent = (coord[0] - min_x)/max_percent_x
             y_percent = (coord[1] - min_y)/max_percent_y
             percent_coord.append((x_percent, y_percent))
-        return percent_coord
+        min_percent_x = abs(min(percent_coord)[0])
+        min_percent_y = abs(min(percent_coord, key= lambda t: t[1])[1])
+        max_percent_x = max(percent_coord)[0]
+        max_percent_y = max(percent_coord, key= lambda t: t[1])[1]
+        if max_percent_x > 1 or max_percent_y > 1:
+            res = []
+            for coord in percent_coord:
+                x_percent = (coord[0] + min_percent_x) / (max_percent_x + min_percent_x)
+                y_percent = (coord[1] + min_percent_y) / (max_percent_y + min_percent_y)
+                res.append((x_percent, y_percent))
+            return res
+        else:
+            return percent_coord
 
 
     def invertPercentCoord(self, coord_table, x = False, y = True):
+        print(min(coord_table, key= lambda t: t[1]))
         return [(1 - coord[0] if x else coord[0], 1 - coord[1] if y else coord[1]) for coord in coord_table]
 
 
@@ -66,6 +79,6 @@ class PrintedCircuit:
         return (x, y)
 
 
-    def get_transformed_coord(self, angle):
-        coord_table = self.getRelativeCoord()
-        return [self.rotate_point(self.getCorner()[0], angle, coord) for coord in coord_table]
+    def get_transformed_coord(self, angle, coord_list = []):
+        coord_table = self.getRelativeCoord() if coord_list == [] else coord_list
+        return [self.rotate_point(self.getCorner()[1], angle, coord) for coord in coord_table]
