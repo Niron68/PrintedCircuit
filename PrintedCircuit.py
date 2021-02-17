@@ -5,6 +5,8 @@ class PrintedCircuit:
 
     def __init__(self, coord_table = []):
         self.coord_table = coord_table
+        self.angle = 0
+        self.growth = 1
 
 
     def getRelativeCoord(self):
@@ -51,7 +53,6 @@ class PrintedCircuit:
 
 
     def invertPercentCoord(self, coord_table, x = False, y = True):
-        print(min(coord_table, key= lambda t: t[1]))
         return [(1 - coord[0] if x else coord[0], 1 - coord[1] if y else coord[1]) for coord in coord_table]
 
 
@@ -82,8 +83,8 @@ class PrintedCircuit:
     def get_angle(a, b, c):
         ab_vector = (b[0] - a[0], b[1] - c[1])
         ac_vector = (c[0] - a[0], c[1] - a[1])
-        ab = sqrt(ab_vector[0] + ab_vector(1))
-        ac = sqrt(ac_vector[0] + ac_vector[1])
+        ab = sqrt((ab_vector[0] * ab_vector[0]) + (ab_vector[1] * ab_vector[1]))
+        ac = sqrt((ac_vector[0] * ac_vector[0]) + (ac_vector[1] * ac_vector[1]))
         cosbac = ((ab_vector[0] * ac_vector[0]) + (ab_vector[1] * ac_vector[1]))/(ab * ac)
         return acos(cosbac)
 
@@ -91,7 +92,7 @@ class PrintedCircuit:
     def get_growth_factor(a, b, c):
         ab = PrintedCircuit.getDistance(a, b)
         ac = PrintedCircuit.getDistance(a, c)
-        return ac / ab
+        return ab / ac
 
 
     def get_transformed_coord(self, angle, coord_list = []):

@@ -41,18 +41,24 @@ class Window:
         self.input_frame = Frame(self.main_frame)
         self.input_x_frame = Frame(self.input_frame)
         self.input_y_frame = Frame(self.input_frame)
+        self.corner_label = Label(self.input_frame, text="Coins supérieur droit: ")
         self.input_x_label = Label(self.input_x_frame, text="X: ")
         self.input_y_label = Label(self.input_y_frame, text="Y: ")
         self.input_x_entry = Entry(self.input_x_frame)
         self.input_y_entry = Entry(self.input_y_frame)
-        self.calculate_button = Button(self.input_frame, text="Calculer", command=self.reverse_canvas)
+        self.angle_label = Label(self.input_frame, text="Angle: 0")
+        self.grandissement_label = Label(self.input_frame, text="Facteur de grandissement: 1")
+        self.calculate_button = Button(self.input_frame, text="Calculer", command=self.calculate_angle)
         self.input_x_label.grid(row=0, column=0)
         self.input_x_entry.grid(row=0, column=1)
         self.input_y_label.grid(row=0, column=0)
         self.input_y_entry.grid(row=0, column=1)
+        self.corner_label.pack()
         self.input_x_frame.pack()
         self.input_y_frame.pack()
         self.calculate_button.pack()
+        self.angle_label.pack()
+        self.grandissement_label.pack()
         self.input_frame.grid(row=0, column=1)
 
 
@@ -65,16 +71,18 @@ class Window:
 
     def load_circuit(self, printed_circuit):
         self.printed_circuit = printed_circuit
+        self.corner_label['text'] = "Coins supérieur droit: " + str(printed_circuit.getCorner()[1])
         self.refresh_preview()
 
 
-    def refresh_preview(self):
-        new_coord = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(0), revert = self.reverse)
-        new_corners = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle = 0, coord_list = self.printed_circuit.getCorner()), revert = not self.reverse)
+    def refresh_preview(self, angle = 0):
+        new_coord = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle), revert = self.reverse)
+        new_corners = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle = angle, coord_list = self.printed_circuit.getCorner()), revert = not self.reverse)
         self.preview_canvas.delete("all")
         for coord in new_coord:
             self.preview_canvas.create_rectangle(coord*2, outline=("red" if coord not in new_corners else "lime"))
         self.label_side_preview['text'] = "SOUDURE" if self.reverse else "COMPOSANT"
+        self.angle_label['text'] = "Angle: " + str(angle)
 
 
     def get_input_file(self):
@@ -82,6 +90,17 @@ class Window:
         circuit = self.create_circuit_from_file(filename)
         if circuit != "":
             self.load_circuit(circuit)
+
+
+    def calculate_angle(self):
+        x = float(self.input_x_entry.get())
+        y = float(self.input_y_entry.get())
+        point = (x, y)
+        corners = self.printed_circuit.getCorner()
+        angle = PrintedCircuit.get_angle(corners[0], corners[1], point)
+        grandissement = PrintedCircuit.get_growth_factor(corners[0], corners[1], point)
+        self.grandissement_label['text'] = "Facteur de grandissement: " + str(grandissement)
+        self.refresh_preview(angle)
 
 
     def create_circuit_from_file(self, filename):
