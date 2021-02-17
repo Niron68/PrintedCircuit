@@ -55,7 +55,7 @@ class PrintedCircuit:
         return [(1 - coord[0] if x else coord[0], 1 - coord[1] if y else coord[1]) for coord in coord_table]
 
 
-    def getDistance(self, first, second):
+    def getDistance(first, second):
         delta_x = abs(first[0] - second[0])
         delta_y = abs(first[1] - second[1])
         return sqrt((delta_x*delta_x)+(delta_y*delta_y))
@@ -65,12 +65,12 @@ class PrintedCircuit:
         coord_table = self.getRelativeCoord()
         min_corner = (min(coord_table)[0], min(coord_table, key= lambda t: t[1])[1])
         max_corner = (max(coord_table)[0], max(coord_table, key= lambda t: t[1])[1])
-        min_distance_list = [self.getDistance(coord, min_corner) for coord in coord_table]
-        max_distance_list = [self.getDistance(coord, max_corner) for coord in coord_table]
+        min_distance_list = [PrintedCircuit.getDistance(coord, min_corner) for coord in coord_table]
+        max_distance_list = [PrintedCircuit.getDistance(coord, max_corner) for coord in coord_table]
         return [coord_table[min_distance_list.index(min(min_distance_list))], coord_table[max_distance_list.index(min(max_distance_list))]]
 
 
-    def rotate_point(self, origin, angle, point):
+    def rotate_point(origin, angle, point):
         radiant_angle = angle * (pi/180)
         delta_x = point[0] - origin[0]
         delta_y = point[1] - origin[1]
@@ -81,4 +81,4 @@ class PrintedCircuit:
 
     def get_transformed_coord(self, angle, coord_list = []):
         coord_table = self.getRelativeCoord() if coord_list == [] else coord_list
-        return [self.rotate_point(self.getCorner()[1], angle, coord) for coord in coord_table]
+        return [PrintedCircuit.rotate_point(self.getCorner()[1], angle, coord) for coord in coord_table]

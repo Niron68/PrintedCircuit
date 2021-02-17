@@ -47,7 +47,6 @@ class Window:
 
     def load_circuit(self, printed_circuit):
         self.printed_circuit = printed_circuit
-        graphe = Graphe(printed_circuit.getRelativeCoord())
         self.refresh_preview()
 
 
