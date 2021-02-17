@@ -79,6 +79,21 @@ class PrintedCircuit:
         return (x, y)
 
 
+    def get_angle(a, b, c):
+        ab_vector = (b[0] - a[0], b[1] - c[1])
+        ac_vector = (c[0] - a[0], c[1] - a[1])
+        ab = sqrt(ab_vector[0] + ab_vector(1))
+        ac = sqrt(ac_vector[0] + ac_vector[1])
+        cosbac = ((ab_vector[0] * ac_vector[0]) + (ab_vector[1] * ac_vector[1]))/(ab * ac)
+        return acos(cosbac)
+
+
+    def get_growth_factor(a, b, c):
+        ab = PrintedCircuit.getDistance(a, b)
+        ac = PrintedCircuit.getDistance(a, c)
+        return ac / ab
+
+
     def get_transformed_coord(self, angle, coord_list = []):
         coord_table = self.getRelativeCoord() if coord_list == [] else coord_list
         return [PrintedCircuit.rotate_point(self.getCorner()[1], angle, coord) for coord in coord_table]

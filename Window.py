@@ -2,7 +2,6 @@ from tkinter import *
 from tkinter import filedialog
 import os
 from PrintedCircuit import *
-from Graphe import *
 
 class Window:
     
@@ -14,18 +13,17 @@ class Window:
         self.window.geometry(geometry)
         self.window.title("PrintedCircuit")
         self.main_frame = Frame(self.window)
-        self.init_input_frame()
+        self.init_input_file_frame()
         self.init_preview_frame()
+        self.init_input_frame()
         self.main_frame.pack()
 
 
-    def init_input_frame(self):
-        self.input_frame = Frame(self.main_frame)
-        self.input_file_entry = Entry(self.input_frame)
-        self.input_file_button = Button(self.input_frame, text="Browse", command=self.get_input_file)
-        self.input_file_entry.grid(row=0, column=0)
-        self.input_file_button.grid(row=0, column=1)
-        self.input_frame.grid(row=0, column=0)
+    def init_input_file_frame(self):
+        self.input_file_frame = Frame(self.main_frame)
+        self.input_file_button = Button(self.input_file_frame, text="Importer", command=self.get_input_file)
+        self.input_file_button.pack()
+        self.input_file_frame.grid(row=0, column=0)
 
 
     def init_preview_frame(self):
@@ -37,6 +35,26 @@ class Window:
         self.preview_canvas.pack()
         self.reverse_button.pack()
         self.preview_frame.grid(column=0, row=1)
+
+
+    def init_input_frame(self):
+        self.input_frame = Frame(self.main_frame)
+        self.input_x_frame = Frame(self.input_frame)
+        self.input_y_frame = Frame(self.input_frame)
+        self.input_x_label = Label(self.input_x_frame, text="X: ")
+        self.input_y_label = Label(self.input_y_frame, text="Y: ")
+        self.input_x_entry = Entry(self.input_x_frame)
+        self.input_y_entry = Entry(self.input_y_frame)
+        self.calculate_button = Button(self.input_frame, text="Calculer", command=self.reverse_canvas)
+        self.input_x_label.grid(row=0, column=0)
+        self.input_x_entry.grid(row=0, column=1)
+        self.input_y_label.grid(row=0, column=0)
+        self.input_y_entry.grid(row=0, column=1)
+        self.input_x_frame.pack()
+        self.input_y_frame.pack()
+        self.calculate_button.pack()
+        self.input_frame.grid(row=0, column=1)
+
 
 
     def reverse_canvas(self):
@@ -51,8 +69,8 @@ class Window:
 
 
     def refresh_preview(self):
-        new_coord = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(-5), revert = self.reverse)
-        new_corners = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle = -5, coord_list = self.printed_circuit.getCorner()), revert = not self.reverse)
+        new_coord = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(0), revert = self.reverse)
+        new_corners = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle = 0, coord_list = self.printed_circuit.getCorner()), revert = not self.reverse)
         self.preview_canvas.delete("all")
         for coord in new_coord:
             self.preview_canvas.create_rectangle(coord*2, outline=("red" if coord not in new_corners else "lime"))
@@ -61,7 +79,6 @@ class Window:
 
     def get_input_file(self):
         filename = self.browse_file()
-        self.input_file_entry.insert(END, filename)
         circuit = self.create_circuit_from_file(filename)
         if circuit != "":
             self.load_circuit(circuit)
