@@ -74,6 +74,7 @@ class Window:
         self.input_move_speed_entry = Entry(self.input_move_speed_frame)
         self.input_perf_speed_entry = Entry(self.input_perf_speed_frame)
         self.input_depth_entry = Entry(self.input_depth_frame)
+        self.generate_button = Button(self.input_data_frame, text="Génerer", command=self.generate_data)
         self.input_move_speed_label.grid(column=0, row=0)
         self.input_move_speed_entry.grid(column=1, row=0)
         self.input_perf_speed_label.grid(column=0, row=0)
@@ -83,6 +84,7 @@ class Window:
         self.input_move_speed_frame.pack()
         self.input_perf_speed_frame.pack()
         self.input_depth_frame.pack()
+        self.generate_button.pack()
         self.input_data_frame.grid(row=1, column=1)
 
 
@@ -115,14 +117,18 @@ class Window:
             self.load_circuit(circuit)
 
 
+    def generate_data(self):
+        print(self.printed_circuit.get_correct_coord())
+
+
     def calculate_angle(self):
         x = float(self.input_x_entry.get())
         y = float(self.input_y_entry.get())
         point = (x, y)
         corners = self.printed_circuit.getCorner()
-        print(corners)
         angle = PrintedCircuit.get_angle(corners[0], corners[1], point)
         grandissement = PrintedCircuit.get_growth_factor(corners[0], corners[1], point)
+        self.printed_circuit.update_attr(angle=angle, growth=grandissement)
         self.grandissement_label['text'] = "Facteur de grandissement: " + str(grandissement)
         self.refresh_preview(angle)
 
