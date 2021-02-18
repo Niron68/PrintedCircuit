@@ -16,6 +16,7 @@ class Window:
         self.init_input_file_frame()
         self.init_preview_frame()
         self.init_input_frame()
+        self.init_input_data_frame()
         self.main_frame.pack()
 
 
@@ -62,6 +63,28 @@ class Window:
         self.input_frame.grid(row=0, column=1)
 
 
+    def init_input_data_frame(self):
+        self.input_data_frame = Frame(self.main_frame)
+        self.input_move_speed_frame = Frame(self.input_data_frame)
+        self.input_perf_speed_frame = Frame(self.input_data_frame)
+        self.input_depth_frame = Frame(self.input_data_frame)
+        self.input_move_speed_label = Label(self.input_move_speed_frame, text="Vitesse déplacement: ")
+        self.input_perf_speed_label = Label(self.input_perf_speed_frame, text="Vitesse percage:          ")
+        self.input_depth_label = Label(self.input_depth_frame, text="Profondeur:                 ")
+        self.input_move_speed_entry = Entry(self.input_move_speed_frame)
+        self.input_perf_speed_entry = Entry(self.input_perf_speed_frame)
+        self.input_depth_entry = Entry(self.input_depth_frame)
+        self.input_move_speed_label.grid(column=0, row=0)
+        self.input_move_speed_entry.grid(column=1, row=0)
+        self.input_perf_speed_label.grid(column=0, row=0)
+        self.input_perf_speed_entry.grid(column=1, row=0)
+        self.input_depth_label.grid(column=0, row=0)
+        self.input_depth_entry.grid(column=1, row=0)
+        self.input_move_speed_frame.pack()
+        self.input_perf_speed_frame.pack()
+        self.input_depth_frame.pack()
+        self.input_data_frame.grid(row=1, column=1)
+
 
     def reverse_canvas(self):
         if self.printed_circuit != "":
@@ -97,6 +120,7 @@ class Window:
         y = float(self.input_y_entry.get())
         point = (x, y)
         corners = self.printed_circuit.getCorner()
+        print(corners)
         angle = PrintedCircuit.get_angle(corners[0], corners[1], point)
         grandissement = PrintedCircuit.get_growth_factor(corners[0], corners[1], point)
         self.grandissement_label['text'] = "Facteur de grandissement: " + str(grandissement)

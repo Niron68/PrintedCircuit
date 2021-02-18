@@ -71,6 +71,10 @@ class PrintedCircuit:
         return [coord_table[min_distance_list.index(min(min_distance_list))], coord_table[max_distance_list.index(min(max_distance_list))]]
 
 
+    def getCorner2(self):
+        pass
+
+
     def rotate_point(origin, angle, point):
         radiant_angle = angle * (pi/180)
         delta_x = point[0] - origin[0]
@@ -80,13 +84,21 @@ class PrintedCircuit:
         return (x, y)
 
 
-    def get_angle(a, b, c):
+    def get_angle2(a, b, c):
         ab_vector = (b[0] - a[0], b[1] - c[1])
         ac_vector = (c[0] - a[0], c[1] - a[1])
         ab = sqrt((ab_vector[0] * ab_vector[0]) + (ab_vector[1] * ab_vector[1]))
         ac = sqrt((ac_vector[0] * ac_vector[0]) + (ac_vector[1] * ac_vector[1]))
         cosbac = ((ab_vector[0] * ac_vector[0]) + (ab_vector[1] * ac_vector[1]))/(ab * ac)
         return acos(cosbac)
+
+
+    def get_angle(a, b, c):
+        angle1 = tan((b[1] - a[1])/(b[0] - a[0]))
+        angle2 = tan((c[1] - a[1])/(c[0] - a[0]))
+        print('angle1   ' + str(angle1))
+        print('angle2   ' + str(angle2))
+        return angle2 - angle1
 
 
     def get_growth_factor(a, b, c):
@@ -98,3 +110,19 @@ class PrintedCircuit:
     def get_transformed_coord(self, angle, coord_list = []):
         coord_table = self.getRelativeCoord() if coord_list == [] else coord_list
         return [PrintedCircuit.rotate_point(self.getCorner()[1], angle, coord) for coord in coord_table]
+
+
+    def get_path_lenght(list):
+        total = 0
+        prev = ""
+        for point in list:
+            if prev != "":
+                total += PrintedCircuit.getDistance(prev, point)
+            prev = point
+        return total
+
+    def get_best_sort(list):
+        list_x = sorted(list)
+        list_y = sorted(list, key=lambda t: t[1])
+        all_list = { PrintedCircuit.get_path_lenght(list): list, PrintedCircuit.get_path_lenght(list_x): list_x, PrintedCircuit.get_path_lenght(list_y): list_y }
+        return all_list[min(all_list, key=all_list.get)]
