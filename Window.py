@@ -68,6 +68,7 @@ class Window:
         self.input_move_speed_frame = Frame(self.input_data_frame)
         self.input_perf_speed_frame = Frame(self.input_data_frame)
         self.input_depth_frame = Frame(self.input_data_frame)
+        self.file_path_frame = Frame(self.input_data_frame)
         self.input_move_speed_label = Label(self.input_move_speed_frame, text="Vitesse déplacement: ")
         self.input_perf_speed_label = Label(self.input_perf_speed_frame, text="Vitesse percage:          ")
         self.input_depth_label = Label(self.input_depth_frame, text="Profondeur:                 ")
@@ -75,17 +76,23 @@ class Window:
         self.input_perf_speed_entry = Entry(self.input_perf_speed_frame)
         self.input_depth_entry = Entry(self.input_depth_frame)
         self.generate_button = Button(self.input_data_frame, text="Génerer", command=self.generate_data)
+        self.file_path_label = Label(self.file_path_frame, text="Sortie: ")
+        self.file_path_entry = Entry(self.file_path_frame, state='normal', width=40)
         self.input_move_speed_label.grid(column=0, row=0)
         self.input_move_speed_entry.grid(column=1, row=0)
         self.input_perf_speed_label.grid(column=0, row=0)
         self.input_perf_speed_entry.grid(column=1, row=0)
         self.input_depth_label.grid(column=0, row=0)
         self.input_depth_entry.grid(column=1, row=0)
+        self.file_path_label.grid(column=0, row=0)
+        self.file_path_entry.grid(column=1, row=0)
         self.input_move_speed_frame.pack()
         self.input_perf_speed_frame.pack()
         self.input_depth_frame.pack()
         self.generate_button.pack()
+        self.file_path_frame.pack()
         self.input_data_frame.grid(row=1, column=1)
+        self.file_path_entry.bind('<1>', self.set_output)
 
 
     def reverse_canvas(self):
@@ -111,14 +118,23 @@ class Window:
 
 
     def get_input_file(self):
-        filename = self.browse_file()
+        filename = Window.browse_file()
         circuit = self.create_circuit_from_file(filename)
         if circuit != "":
             self.load_circuit(circuit)
 
 
+    def set_output(self, event = ''):
+        path = filedialog.askdirectory()
+        self.file_path_entry['state'] = 'normal'
+        self.file_path_entry.delete(0, END)
+        self.file_path_entry.insert(END, path)
+        self.file_path_entry['state'] = 'disabled'
+
+
     def generate_data(self):
         print(self.printed_circuit.get_correct_coord())
+        print(PrintedCircuit.get_path_lenght(self.printed_circuit.get_correct_coord()))
 
 
     def calculate_angle(self):
@@ -147,9 +163,13 @@ class Window:
         return ""
 
 
-    def browse_file(self):
+    def browse_file(event = ''):
         return filedialog.askopenfilename()
 
 
     def mainloop(self):
         self.window.mainloop()
+
+
+    def generate_document():
+        pass
