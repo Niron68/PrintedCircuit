@@ -75,7 +75,7 @@ class Window:
         self.input_move_speed_entry = Entry(self.input_move_speed_frame)
         self.input_perf_speed_entry = Entry(self.input_perf_speed_frame)
         self.input_depth_entry = Entry(self.input_depth_frame)
-        self.generate_button = Button(self.input_data_frame, text="Génerer", command=self.generate_data)
+        self.generate_button = Button(self.input_data_frame, text="Génerer", command=self.write)
         self.file_path_label = Label(self.file_path_frame, text="Sortie: ")
         self.file_path_entry = Entry(self.file_path_frame, state='normal', width=40)
         self.input_move_speed_label.grid(column=0, row=0)
@@ -132,11 +132,6 @@ class Window:
         self.file_path_entry['state'] = 'disabled'
 
 
-    def generate_data(self):
-        print(self.printed_circuit.get_correct_coord())
-        print(PrintedCircuit.get_path_lenght(self.printed_circuit.get_correct_coord()))
-
-
     def calculate_angle(self):
         x = float(self.input_x_entry.get())
         y = float(self.input_y_entry.get())
@@ -171,5 +166,24 @@ class Window:
         self.window.mainloop()
 
 
-    def generate_document():
-        pass
+    def generate_document(self):
+        correct_coord = self.printed_circuit.get_correct_coord()
+        move_speed = int(self.input_move_speed_entry.get())
+        perf_speed = int(self.input_perf_speed_entry.get())
+        depth = int(self.input_depth_entry.get())*(-1)
+        res = "G94\nG1 Z1\n"
+        for coord in correct_coord:
+            res += "G1 X" + str(round(coord[0], 3)) + " Y" + str(round(coord[1], 3)) + " F" + str(move_speed) + ";\n"
+            res += "G1 Z" + str(depth) + " F" + str(perf_speed) + "\n"
+            res += "G1 Z1 F" + str(move_speed) + "\n"
+        return res
+
+
+    def write(self):
+        filepath = self.file_path_entry.get()
+        if os.path.exists(filepath):
+            doc = self.generate_document()
+            with open(filepath + '/resultat.txt', 'w') as f:
+                f.write(doc)
+                f.close()
+

@@ -147,5 +147,5 @@ class PrintedCircuit:
         coord_table = self.getRelativeCoord()
         corners = self.getCorner()
         coord_list = [(coord[0] - corners[0][0], coord[1] - corners[0][1]) for coord in coord_table]
-        #coord_list = self.get_transformed_coord(self.angle, coord_list=coord_list)
+        coord_list = self.get_transformed_coord(self.angle, coord_list=coord_list)
         return PrintedCircuit.get_best_sort([(coord[0] * self.growth, coord[1] * self.growth) for coord in coord_list])
