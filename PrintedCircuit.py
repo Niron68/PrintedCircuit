@@ -67,13 +67,13 @@ class PrintedCircuit:
         return sqrt((delta_x*delta_x)+(delta_y*delta_y))
 
 
-    def getCorner(self):
-        coord_table = self.getRelativeCoord()
+    def getCorner(self, table = []):
+        coord_table = self.getRelativeCoord() if table == [] else table
         min_corner = (min(coord_table)[0], min(coord_table, key= lambda t: t[1])[1])
-        max_corner = (max(coord_table)[0], max(coord_table, key= lambda t: t[1])[1])
+        # max_corner = (max(coord_table)[0], max(coord_table, key= lambda t: t[1])[1])
         min_distance_list = [PrintedCircuit.getDistance(coord, min_corner) for coord in coord_table]
-        max_distance_list = [PrintedCircuit.getDistance(coord, max_corner) for coord in coord_table]
-        return [coord_table[min_distance_list.index(min(min_distance_list))], coord_table[max_distance_list.index(min(max_distance_list))]]
+        # max_distance_list = [PrintedCircuit.getDistance(coord, max_corner) for coord in coord_table]
+        return [coord_table[min_distance_list.index(min(min_distance_list))], coord_table[min_distance_list.index(max(min_distance_list))]]
 
 
     def getCorner2(self):
