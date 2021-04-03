@@ -1,11 +1,12 @@
 from tkinter import *
 from tkinter import filedialog
+from tkinter import messagebox #for messagebox.
 import os
 from PrintedCircuit import *
 
 class Window:
     
-    def __init__(self, geometry = "1280x720", preview=(480, 360)):
+    def __init__(self, geometry = "1280x720", preview=(720, 480)):
         self.printed_circuit = ""
         self.reverse = True
         self.preview_size = preview
@@ -29,12 +30,14 @@ class Window:
 
     def init_preview_frame(self):
         self.preview_frame = Frame(self.main_frame)
-        self.label_side_preview = Label(self.preview_frame, text="SOUDURE")
+        self.reverse_frame = Frame(self.preview_frame)
+        self.label_side_preview = Label(self.reverse_frame, text="SOUDURE")
         self.preview_canvas = Canvas(self.preview_frame, width = self.preview_size[0], height = self.preview_size[1], bg = "#000000")
-        self.reverse_button = Button(self.preview_frame, text="reverse", command=self.reverse_canvas)
-        self.label_side_preview.pack()
+        self.reverse_button = Button(self.reverse_frame, text="reverse", command=self.reverse_canvas)
+        self.reverse_button.grid(column=0, row=0)
+        self.label_side_preview.grid(column=1, row=0)
+        self.reverse_frame.pack()
         self.preview_canvas.pack()
-        self.reverse_button.pack()
         self.preview_frame.grid(column=0, row=1)
 
 
@@ -48,7 +51,8 @@ class Window:
         self.input_x_entry = Entry(self.input_x_frame)
         self.input_y_entry = Entry(self.input_y_frame)
         self.angle_label = Label(self.input_frame, text="Angle: 0")
-        self.grandissement_label = Label(self.input_frame, text="Facteur de grandissement: 1")
+        self.grandissement_X_label = Label(self.input_frame, text="Facteur de grandissement X : 1")
+        self.grandissement_Y_label = Label(self.input_frame, text="Facteur de grandissement Y : 1")
         self.calculate_button = Button(self.input_frame, text="Calculer", command=self.calculate_angle)
         self.input_x_label.grid(row=0, column=0)
         self.input_x_entry.grid(row=0, column=1)
@@ -59,7 +63,8 @@ class Window:
         self.input_y_frame.pack()
         self.calculate_button.pack()
         self.angle_label.pack()
-        self.grandissement_label.pack()
+        self.grandissement_X_label.pack()
+        self.grandissement_Y_label.pack()
         self.input_frame.grid(row=0, column=1)
 
 
@@ -68,13 +73,16 @@ class Window:
         self.input_move_speed_frame = Frame(self.input_data_frame)
         self.input_perf_speed_frame = Frame(self.input_data_frame)
         self.input_depth_frame = Frame(self.input_data_frame)
+        self.input_hauteur_frame = Frame(self.input_data_frame)
         self.file_path_frame = Frame(self.input_data_frame)
         self.input_move_speed_label = Label(self.input_move_speed_frame, text="Vitesse déplacement: ")
         self.input_perf_speed_label = Label(self.input_perf_speed_frame, text="Vitesse percage:          ")
         self.input_depth_label = Label(self.input_depth_frame, text="Profondeur:                 ")
-        self.input_move_speed_entry = Entry(self.input_move_speed_frame)
-        self.input_perf_speed_entry = Entry(self.input_perf_speed_frame)
-        self.input_depth_entry = Entry(self.input_depth_frame)
+        self.input_hauteur_label = Label(self.input_hauteur_frame, text="Hauteur Remontée:    ")
+        self.input_move_speed_entry = Entry(self.input_move_speed_frame, textvariable=StringVar(self.input_move_speed_frame, "200"))
+        self.input_perf_speed_entry = Entry(self.input_perf_speed_frame, textvariable=StringVar(self.input_perf_speed_frame, "50"))
+        self.input_depth_entry = Entry(self.input_depth_frame,textvariable=StringVar(self.input_depth_frame, "3"))
+        self.input_hauteur_entry = Entry(self.input_hauteur_frame,textvariable=StringVar(self.input_hauteur_frame, "1"))
         self.generate_button = Button(self.input_data_frame, text="Génerer", command=self.write)
         self.file_path_label = Label(self.file_path_frame, text="Sortie: ")
         self.file_path_entry = Entry(self.file_path_frame, state='normal', width=40)
@@ -84,15 +92,19 @@ class Window:
         self.input_perf_speed_entry.grid(column=1, row=0)
         self.input_depth_label.grid(column=0, row=0)
         self.input_depth_entry.grid(column=1, row=0)
+        self.input_hauteur_label.grid(column=0, row=0)
+        self.input_hauteur_entry.grid(column=1, row=0)
         self.file_path_label.grid(column=0, row=0)
         self.file_path_entry.grid(column=1, row=0)
         self.input_move_speed_frame.pack()
         self.input_perf_speed_frame.pack()
         self.input_depth_frame.pack()
-        self.generate_button.pack()
+        self.input_hauteur_frame.pack()
         self.file_path_frame.pack()
+        self.generate_button.pack()
         self.input_data_frame.grid(row=1, column=1)
         self.file_path_entry.bind('<1>', self.set_output)
+        
 
 
     def reverse_canvas(self):
@@ -103,16 +115,22 @@ class Window:
 
     def load_circuit(self, printed_circuit):
         self.printed_circuit = printed_circuit
-        self.corner_label['text'] = "Coins supérieur droit: " + str(printed_circuit.getCorner()[1])
+        corners = printed_circuit.getCorner()
+        self.corner_label['text'] = "Coins supérieur droit: " + str((round(corners[1][0], 3), round(corners[1][1], 3))) + " (" + str(len(printed_circuit.coord_table)) + " pts)"
         self.refresh_preview()
 
 
     def refresh_preview(self, angle = 0):
         new_coord = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle), revert = self.reverse)
-        new_corners = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle = angle, coord_list = self.printed_circuit.getCorner()), revert = not self.reverse)
+        # new_corners = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle = angle, coord_list = self.printed_circuit.getCorner()), revert = not self.reverse)
+        new_corners = self.printed_circuit.getCorner(new_coord, self.reverse)
         self.preview_canvas.delete("all")
+        print(new_corners)
+        # messagebox.showinfo("Notification", new_corners) #msgbox
         for coord in new_coord:
             self.preview_canvas.create_rectangle(coord*2, outline=("red" if coord not in new_corners else "lime"))
+        for coord in new_corners:
+            self.preview_canvas.create_rectangle(coord*2, outline="lime")
         self.label_side_preview['text'] = "SOUDURE" if self.reverse else "COMPOSANT"
         self.angle_label['text'] = "Angle: " + str(angle)
 
@@ -138,7 +156,7 @@ class Window:
         point = (x, y)
         corners = self.printed_circuit.getCorner()
         angle = PrintedCircuit.get_angle(corners[0], corners[1], point)
-        grandissement = PrintedCircuit.get_growth_factor(corners[0], corners[1], point)
+        grandissement = PrintedCircuit.get_growth_factor((0, 0), corners[1], point)
         self.printed_circuit.update_attr(angle=angle, growth=grandissement)
         self.grandissement_label['text'] = "Facteur de grandissement: " + str(grandissement)
         self.refresh_preview(angle)
@@ -167,13 +185,20 @@ class Window:
 
 
     def generate_document(self):
-        correct_coord = self.printed_circuit.get_correct_coord()
+        correct_coord = PrintedCircuit.get_positive_coord(self.printed_circuit.get_correct_coord(), revert=False)
         move_speed = int(self.input_move_speed_entry.get())
         perf_speed = int(self.input_perf_speed_entry.get())
         depth = int(self.input_depth_entry.get())*(-1)
-        res = "G94\nG1 Z1\n"
-        for coord in correct_coord:
-            res += "G1 X" + str(round(coord[0], 3)) + " Y" + str(round(coord[1], 3)) + " F" + str(move_speed) + ";\n"
+        res = "G1 Z1 F"+ str(move_speed) +"\n"
+        new_list = []
+        double_list = []
+        for i in correct_coord:
+            rounded = (round(i[0], 1), round(i[1], 1))
+            if rounded not in double_list:
+                new_list.append(i)
+                double_list.append(rounded)
+        for coord in new_list:
+            res += "G1 X" + str(round(coord[0], 3)) + " Y" + str(round(coord[1], 3)) + " F" + str(move_speed) + "\n"
             res += "G1 Z" + str(depth) + " F" + str(perf_speed) + "\n"
             res += "G1 Z1 F" + str(move_speed) + "\n"
         return res

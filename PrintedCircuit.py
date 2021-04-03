@@ -9,17 +9,27 @@ class PrintedCircuit:
         self.growth = 1
 
 
-    def getRelativeCoord(self):
+    def getRelativeCoord(self):    #  tableau x y  origine
         res = []
         min_x = abs(min(self.coord_table)[0])
         min_y = abs(min(self.coord_table, key = lambda t: t[1])[1])
         for coord in self.coord_table:
             res.append((coord[0] + min_x, coord[1] + min_y))
+            #print(coord[0],coord[1])
         if min(res)[0] != 0 or min(res, key= lambda t: t[1])[1] != 0:
             min_x = min(res)[0]
             min_y = min(res, key= lambda t: t[1])[1]
             old_res = res
             res = [(coord[0] - min_x, coord[1] - min_y) for coord in old_res]
+        #print('tttttttt')
+        new_list = []
+        double_list = []
+        for i in self.coord_table:
+            rounded = (round(i[0], 1), round(i[1], 1))
+            if rounded not in double_list:
+                new_list.append(i)
+                double_list.append(rounded)
+        #print(new_list)
         return res
 
 
@@ -67,13 +77,21 @@ class PrintedCircuit:
         return sqrt((delta_x*delta_x)+(delta_y*delta_y))
 
 
-    def getCorner(self):
-        coord_table = self.getRelativeCoord()
+    def getCorner(self, table = [], revert = False):
+        coord_table = self.getRelativeCoord() if table == [] else table
         min_corner = (min(coord_table)[0], min(coord_table, key= lambda t: t[1])[1])
-        max_corner = (max(coord_table)[0], max(coord_table, key= lambda t: t[1])[1])
-        min_distance_list = [PrintedCircuit.getDistance(coord, min_corner) for coord in coord_table]
-        max_distance_list = [PrintedCircuit.getDistance(coord, max_corner) for coord in coord_table]
-        return [coord_table[min_distance_list.index(min(min_distance_list))], coord_table[max_distance_list.index(min(max_distance_list))]]
+        if revert:
+            min_corner = (min(coord_table)[0], max(coord_table, key= lambda t: t[1])[1])
+        # max_corner = (max(coord_table)[0], max(coord_table, key= lambda t: t[1])[1])
+        # print("min_corner" + str(min_corner))
+        # print("max_corner" + str(max_corner))
+        min_distance_list = [PrintedCircuit.getDistance(min_corner, coord) for coord in coord_table]
+        # max_distance_list = [PrintedCircuit.getDistance(coord, max_corner) for coord in coord_table]
+        #print("------------")
+        #print(max(min_distance_list))
+        #print(coord_table[min_distance_list.index(min(min_distance_list))])
+        #print("min      " + str(min_corner))
+        return [coord_table[min_distance_list.index(min(min_distance_list))], coord_table[min_distance_list.index(max(min_distance_list))]]
 
 
     def getCorner2(self):
@@ -112,7 +130,7 @@ class PrintedCircuit:
     def get_growth_factor(a, b, c):
         ab = PrintedCircuit.getDistance(a, b)
         ac = PrintedCircuit.getDistance(a, c)
-        return ab / ac
+        return ac / ab
 
 
     def get_transformed_coord(self, angle, coord_list = []):
@@ -143,9 +161,24 @@ class PrintedCircuit:
             self.growth = growth
 
 
+    def get_positive_coord(table, revert = True):
+        coord_table = table
+        if revert:
+            coord_table = [(coord[0]*(-1), coord[1]) for coord in table]
+        min_x = abs(min(coord_table)[0])
+        min_y = abs(min(coord_table, key= lambda t: t[1])[1])
+        res = []
+        for coord in coord_table:
+            #print("#################")
+            #print("coord y   " + str(coord[1]) + "      min y   " + str(min_y))
+            new_coord = (coord[0] + min_x, coord[1] + min_y)
+            res.append(new_coord)
+        return res
+
+
     def get_correct_coord(self):
-        coord_table = self.getRelativeCoord()
+        coord_table = PrintedCircuit.get_positive_coord(self.getRelativeCoord())
         corners = self.getCorner()
         coord_list = [(coord[0] - corners[0][0], coord[1] - corners[0][1]) for coord in coord_table]
-        coord_list = self.get_transformed_coord(self.angle, coord_list=coord_list)
-        return PrintedCircuit.get_best_sort([(coord[0] * self.growth, coord[1] * self.growth) for coord in coord_list])
+        coord_list = self.get_transformed_coord(self.angle * (-1), coord_list=coord_list)
+        return PrintedCircuit.get_best_sort([(coord[0] * self.growth, coord[1] * self.growth) for coord in coord_list])  #correction zoom
