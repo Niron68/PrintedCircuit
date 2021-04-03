@@ -1,4 +1,5 @@
 from math import *
+from operator import mul
 
 class PrintedCircuit:
 
@@ -15,13 +16,11 @@ class PrintedCircuit:
         min_y = abs(min(self.coord_table, key = lambda t: t[1])[1])
         for coord in self.coord_table:
             res.append((coord[0] + min_x, coord[1] + min_y))
-            #print(coord[0],coord[1])
         if min(res)[0] != 0 or min(res, key= lambda t: t[1])[1] != 0:
             min_x = min(res)[0]
             min_y = min(res, key= lambda t: t[1])[1]
             old_res = res
             res = [(coord[0] - min_x, coord[1] - min_y) for coord in old_res]
-        #print('tttttttt')
         new_list = []
         double_list = []
         for i in self.coord_table:
@@ -29,7 +28,6 @@ class PrintedCircuit:
             if rounded not in double_list:
                 new_list.append(i)
                 double_list.append(rounded)
-        #print(new_list)
         return res
 
 
@@ -120,9 +118,11 @@ class PrintedCircuit:
 
 
     def get_growth_factor(a, b, c):
-        ab = PrintedCircuit.getDistance(a, b)
-        ac = PrintedCircuit.getDistance(a, c)
-        return ac / ab
+        abx = a[0] - b[0]
+        aby = a[1] - b[1]
+        acx = a[0] - c[0]
+        acy = a[1] - c[1]
+        return (acx / abx, acy / aby)
 
 
     def get_transformed_coord(self, angle, coord_list = []):
@@ -161,8 +161,6 @@ class PrintedCircuit:
         min_y = abs(min(coord_table, key= lambda t: t[1])[1])
         res = []
         for coord in coord_table:
-            #print("#################")
-            #print("coord y   " + str(coord[1]) + "      min y   " + str(min_y))
             new_coord = (coord[0] + min_x, coord[1] + min_y)
             res.append(new_coord)
         return res
@@ -173,4 +171,4 @@ class PrintedCircuit:
         corners = self.getCorner()
         coord_list = [(coord[0] - corners[0][0], coord[1] - corners[0][1]) for coord in coord_table]
         coord_list = self.get_transformed_coord(self.angle * (-1), coord_list=coord_list)
-        return PrintedCircuit.get_best_sort([(coord[0] * self.growth, coord[1] * self.growth) for coord in coord_list])  #correction zoom
+        return PrintedCircuit.get_best_sort([(map(mul, coord[0], self.growth), map(mul, coord[1] * self.growth)) for coord in coord_list])  #correction zoom

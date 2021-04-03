@@ -122,11 +122,9 @@ class Window:
 
     def refresh_preview(self, angle = 0):
         new_coord = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle), revert = self.reverse)
-        # new_corners = self.printed_circuit.getCoordInCanvas(width=self.preview_size[0], height=self.preview_size[1], coord_list=self.printed_circuit.get_transformed_coord(angle = angle, coord_list = self.printed_circuit.getCorner()), revert = not self.reverse)
         new_corners = self.printed_circuit.getCorner(new_coord, self.reverse)
         self.preview_canvas.delete("all")
         print(new_corners)
-        # messagebox.showinfo("Notification", new_corners) #msgbox
         for coord in new_coord:
             self.preview_canvas.create_rectangle(coord*2, outline=("red" if coord not in new_corners else "lime"))
         for coord in new_corners:
@@ -158,7 +156,10 @@ class Window:
         angle = PrintedCircuit.get_angle(corners[0], corners[1], point)
         grandissement = PrintedCircuit.get_growth_factor((0, 0), corners[1], point)
         self.printed_circuit.update_attr(angle=angle, growth=grandissement)
-        self.grandissement_label['text'] = "Facteur de grandissement: " + str(grandissement)
+        self.grandissement_X_label['text'] = "Facteur de grandissement: " + str(grandissement[0])
+        self.grandissement_Y_label['text'] = "Facteur de grandissement: " + str(grandissement[1])
+        print('grandissement')
+        print(grandissement)
         self.refresh_preview(angle)
 
 
