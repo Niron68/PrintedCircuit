@@ -82,15 +82,7 @@ class PrintedCircuit:
         min_corner = (min(coord_table)[0], min(coord_table, key= lambda t: t[1])[1])
         if revert:
             min_corner = (min(coord_table)[0], max(coord_table, key= lambda t: t[1])[1])
-        # max_corner = (max(coord_table)[0], max(coord_table, key= lambda t: t[1])[1])
-        # print("min_corner" + str(min_corner))
-        # print("max_corner" + str(max_corner))
         min_distance_list = [PrintedCircuit.getDistance(min_corner, coord) for coord in coord_table]
-        # max_distance_list = [PrintedCircuit.getDistance(coord, max_corner) for coord in coord_table]
-        #print("------------")
-        #print(max(min_distance_list))
-        #print(coord_table[min_distance_list.index(min(min_distance_list))])
-        #print("min      " + str(min_corner))
         return [coord_table[min_distance_list.index(min(min_distance_list))], coord_table[min_distance_list.index(max(min_distance_list))]]
 
 
